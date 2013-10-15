@@ -524,11 +524,11 @@ class PXEGen:
             # this is an image we are making available, not kernel+initrd
             if image.image_type == "direct":
                 kernel_path = os.path.join("/images2",image.name)
-            elif image.image_type == "memdisk":
+            elif image.image_type in ["memdisk","iso"]:
                 kernel_path = "/memdisk"
                 initrd_path = os.path.join("/images2",image.name)
             else:
-                # CD-ROM ISO or virt-clone image? We can't PXE boot it.
+                # virt-clone image? We can't PXE boot it.
                 kernel_path = None
                 initrd_path = None
 
@@ -617,7 +617,10 @@ class PXEGen:
         if distro and distro.os_version.startswith("esxi") and filename is not None:
             append_line = "BOOTIF=%s" % (os.path.basename(filename))
         elif metadata.has_key("initrd_path") and (not arch or arch not in ["ia64", "ppc", "ppc64", "arm"]):
-            append_line = "append initrd=%s" % (metadata["initrd_path"])
+            if image and image.image_type == "iso":
+                append_line = "append iso initrd=%s" % (metadata["initrd_path"])
+            else:
+                append_line = "append initrd=%s" % (metadata["initrd_path"])
         else:
             append_line = "append "
         append_line = "%s%s" % (append_line, kernel_options)
