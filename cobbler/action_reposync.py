@@ -24,8 +24,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 import os
 import os.path
 import time
-import yaml # Howell-Clark version
 import sys
+
 HAS_YUM = True
 try:
     import yum
@@ -536,8 +536,9 @@ class RepoSync:
         config_file = open(fname, "w+")
         config_file.write("[%s]\n" % repo.name)
         config_file.write("name=%s\n" % repo.name)
-        config_file.write("exclude=%s\n" % repo.yumopts['exclude'])
-        self.logger.debug("excluding: %s" % repo.yumopts['exclude'])
+        if 'exclude' in repo.yumopts.keys():
+            config_file.write("exclude=%s\n" % repo.yumopts['exclude'])
+            self.logger.debug("excluding: %s" % repo.yumopts['exclude'])
         optenabled = False
         optgpgcheck = False
         if output:
